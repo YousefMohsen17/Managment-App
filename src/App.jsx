@@ -6,9 +6,7 @@ import { useState, useRef } from "react";
 import ModalWindow from "./components/ModalWindow.jsx";
 
 function App() {
-  const [formDisplay, setFormDisplay] = useState(false);
-  const [dialogDisplay, setDialogDisplay] = useState(false);
-  const [projectDisplay, setProjectDisplay] = useState(false);
+  const [displayToUser, setDisplayToUser] = useState("");
   const [createdProjects, setCreatedProjects] = useState([]);
   const [projectInfo, setProjectInfo] = useState([]);
   const [targetProject, setTargetProject] = useState("");
@@ -30,24 +28,20 @@ function App() {
       newProject.desc === "" ||
       newProject.date === ""
     ) {
-      setDialogDisplay(true);
+      setDisplayToUser("modal");
       dialog.current.showModal();
     } else {
+      setDisplayToUser("no-project");
       setCreatedProjects((prevCreated) => [...prevCreated, newTitle]);
-      setFormDisplay(false);
-      setProjectDisplay(false);
-
       setProjectInfo((prevCreated) => [...prevCreated, newProject]);
     }
   }
   function handleClick(index) {
-    setProjectDisplay(true);
-    setFormDisplay(false);
+    setDisplayToUser("project-info");
     setTargetProject(projectInfo[index]);
   }
   function handleDelete(e) {
-    setFormDisplay(false);
-    setProjectDisplay(false);
+    setDisplayToUser("no-project");
     const targetEl = createdProjects.indexOf(
       e.target.previousSibling.innerHTML
     );
@@ -56,26 +50,25 @@ function App() {
   }
 
   let content;
-  if (formDisplay) {
+  if (displayToUser === "add-project") {
     content = (
       <AddingProject
         titleRef={inputUser.title}
         descRef={inputUser.desc}
         dateRef={inputUser.date}
         onCancel={() => {
-          setFormDisplay(false);
-          setProjectDisplay(false);
+          setDisplayToUser("no-project");
         }}
         onSave={handleSave}
       />
     );
-  } else if (!formDisplay && projectDisplay && targetProject) {
+  } else if (displayToUser === "project-info") {
     content = <ProjectInfo inputUser={targetProject} onDelete={handleDelete} />;
   } else {
     content = (
       <Header
         onClick={() => {
-          setFormDisplay(true);
+          setDisplayToUser("add-project");
         }}
       />
     );
@@ -83,12 +76,12 @@ function App() {
 
   return (
     <>
-      {dialogDisplay && (
-        <ModalWindow ref={dialog} onOk={() => setDialogDisplay(false)} />
+      {displayToUser === "modal" && (
+        <ModalWindow ref={dialog} onOk={() => setDisplayToUser("addProject")} />
       )}
       <main className="h-screen my-8 flex gap-8">
         <SideBar
-          onAdd={() => setFormDisplay(true)}
+          onAdd={() => setDisplayToUser("add-project")}
           projects={createdProjects}
           onClick={handleClick}
         />
