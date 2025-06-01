@@ -7,7 +7,6 @@ import ModalWindow from "./components/ModalWindow.jsx";
 
 function App() {
   const [displayToUser, setDisplayToUser] = useState("");
-  const [createdProjects, setCreatedProjects] = useState([]);
   const [projectInfo, setProjectInfo] = useState([]);
   const [targetProject, setTargetProject] = useState("");
   const inputUser = {
@@ -32,7 +31,6 @@ function App() {
       dialog.current.showModal();
     } else {
       setDisplayToUser("no-project");
-      setCreatedProjects((prevCreated) => [...prevCreated, newTitle]);
       setProjectInfo((prevCreated) => [...prevCreated, newProject]);
     }
   }
@@ -42,10 +40,9 @@ function App() {
   }
   function handleDelete(e) {
     setDisplayToUser("no-project");
-    const targetEl = createdProjects.indexOf(
-      e.target.previousSibling.innerHTML
+    const targetEl = projectInfo.findIndex(
+      (p) => p.title === e.target.previousSibling.innerHTML
     );
-    createdProjects.splice(targetEl, 1);
     projectInfo.splice(targetEl, 1);
   }
 
@@ -82,7 +79,7 @@ function App() {
       <main className="h-screen my-8 flex gap-8">
         <SideBar
           onAdd={() => setDisplayToUser("add-project")}
-          projects={createdProjects}
+          projects={projectInfo}
           onClick={handleClick}
         />
         {content}
