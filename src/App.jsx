@@ -2,13 +2,19 @@ import SideBar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";
 import AddingProject from "./components/AddingProject.jsx";
 import ProjectInfo from "./components/ProjectInfo.jsx";
-import { useState, useRef } from "react";
 import ModalWindow from "./components/ModalWindow.jsx";
+import { useState, useRef } from "react";
 
 function App() {
   const [displayToUser, setDisplayToUser] = useState("");
   const [projectInfo, setProjectInfo] = useState([]);
+  const [taskName, setTaskName] = useState("");
   const [targetProject, setTargetProject] = useState("");
+  const inputTask = useRef();
+
+  function handleChange() {
+    setTaskName(inputTask.current.value);
+  }
   const inputUser = {
     title: useRef(),
     desc: useRef(),
@@ -22,13 +28,13 @@ function App() {
       desc: inputUser.desc.current.value,
       date: inputUser.date.current.value,
       id: crypto.randomUUID(),
+      tasks: [],
     };
     if (
       newProject.title === "" ||
       newProject.desc === "" ||
       newProject.date === ""
     ) {
-      // setDisplayToUser("modal");
       modalRef.current.open();
     } else {
       setDisplayToUser("no-project");
@@ -44,6 +50,28 @@ function App() {
       prevProjects.filter((project) => project.id !== id)
     );
     setDisplayToUser("no-project");
+  }
+
+  function handleAddTaskToProject() {
+    setProjectInfo((prevProjects) => {
+      const updatedProjects = prevProjects.map((project) =>
+        project.id === targetProject.id
+          ? { ...project, tasks: [...project.tasks, taskName] }
+          : project
+      );
+      const updatedTargetProject = updatedProjects.find(
+        (project) => project.id === targetProject.id
+      );
+      setTargetProject(updatedTargetProject);
+      return updatedProjects;
+    });
+    setTaskName("");
+  }
+  function handleClearTask(index) {
+    setTargetProject((prevtarget) => ({
+      ...prevtarget,
+      tasks: prevtarget.tasks.filter((_, i) => index !== i),
+    }));
   }
   let content;
   if (displayToUser === "add-project") {
@@ -61,8 +89,13 @@ function App() {
   } else if (displayToUser === "project-info") {
     content = (
       <ProjectInfo
-        inputUser={targetProject}
+        targetProject={targetProject}
         onDelete={() => handleDelete(targetProject.id)}
+        taskName={taskName}
+        ref={inputTask}
+        onChange={handleChange}
+        onAddTask={handleAddTaskToProject}
+        onClear={handleClearTask}
       />
     );
   } else {
