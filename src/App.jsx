@@ -21,6 +21,7 @@ function App() {
       title: newTitle,
       desc: inputUser.desc.current.value,
       date: inputUser.date.current.value,
+      id: crypto.randomUUID(),
     };
     if (
       newProject.title === "" ||
@@ -38,14 +39,12 @@ function App() {
     setDisplayToUser("project-info");
     setTargetProject(projectInfo[index]);
   }
-  function handleDelete(e) {
-    setDisplayToUser("no-project");
-    const targetEl = projectInfo.findIndex(
-      (p) => p.title === e.target.previousSibling.innerHTML
+  function handleDelete(id) {
+    setProjectInfo((prevProjects) =>
+      prevProjects.filter((project) => project.id !== id)
     );
-    projectInfo.splice(targetEl, 1);
+    setDisplayToUser("no-project");
   }
-
   let content;
   if (displayToUser === "add-project") {
     content = (
@@ -60,7 +59,12 @@ function App() {
       />
     );
   } else if (displayToUser === "project-info") {
-    content = <ProjectInfo inputUser={targetProject} onDelete={handleDelete} />;
+    content = (
+      <ProjectInfo
+        inputUser={targetProject}
+        onDelete={() => handleDelete(targetProject.id)}
+      />
+    );
   } else {
     content = (
       <Header
