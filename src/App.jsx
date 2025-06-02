@@ -14,7 +14,7 @@ function App() {
     desc: useRef(),
     date: useRef(),
   };
-  const dialog = useRef();
+  const modalRef = useRef();
   function handleSave() {
     const newTitle = inputUser.title.current.value;
     const newProject = {
@@ -27,8 +27,8 @@ function App() {
       newProject.desc === "" ||
       newProject.date === ""
     ) {
-      setDisplayToUser("modal");
-      dialog.current.showModal();
+      // setDisplayToUser("modal");
+      modalRef.current.open();
     } else {
       setDisplayToUser("no-project");
       setProjectInfo((prevCreated) => [...prevCreated, newProject]);
@@ -73,9 +73,11 @@ function App() {
 
   return (
     <>
-      {displayToUser === "modal" && (
-        <ModalWindow ref={dialog} onOk={() => setDisplayToUser("addProject")} />
-      )}
+      <ModalWindow
+        ref={modalRef}
+        onOk={() => setDisplayToUser("add-project")}
+      />
+
       <main className="h-screen my-8 flex gap-8">
         <SideBar
           onAdd={() => setDisplayToUser("add-project")}

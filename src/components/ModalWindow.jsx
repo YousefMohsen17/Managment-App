@@ -1,10 +1,18 @@
 import { createPortal } from "react-dom";
-import { useRef } from "react";
+import { useImperativeHandle, useRef } from "react";
 export default function ModalWindow({ ref, onOk }) {
+  const dialog = useRef();
+  useImperativeHandle(ref, () => {
+    return {
+      open() {
+        dialog.current.showModal();
+      },
+    };
+  });
   return createPortal(
     <dialog
       className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md"
-      ref={ref}
+      ref={dialog}
     >
       <h2 className="text-xl font-bold text-stone-700 my-4">Invalid Input</h2>
       <p className="text-stone-600 mb-4">
